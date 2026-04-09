@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Northwest Accent Coach</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      :root {
+        --bg-1: #0b1020;
+        --bg-2: #111b3a;
+        --accent: #22d3ee;
+        --accent-2: #14b8a6;
+        --text: #e5f0ff;
+        --muted: #9bb0d1;
+        --panel: rgba(12, 20, 44, 0.74);
+        --line: rgba(119, 152, 230, 0.28);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Segoe UI Variable", "Segoe UI", Tahoma, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 15% 20%, rgba(34, 211, 238, 0.22), transparent 40%),
+          radial-gradient(circle at 85% 0%, rgba(20, 184, 166, 0.2), transparent 35%),
+          linear-gradient(120deg, var(--bg-1), var(--bg-2));
+        min-height: 100vh;
+      }
+
+      .wrap {
+        max-width: 1150px;
+        margin: 0 auto;
+        padding: 28px 18px 40px;
+      }
+
+      .hero {
+        background: linear-gradient(140deg, rgba(18, 31, 62, 0.86), rgba(9, 16, 35, 0.84));
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 24px;
+        box-shadow: 0 18px 36px rgba(2, 8, 20, 0.45);
+        backdrop-filter: blur(8px);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(1.8rem, 3vw, 2.6rem);
+        letter-spacing: 0.02em;
+      }
+
+      .subtitle {
+        margin-top: 8px;
+        color: var(--muted);
+        line-height: 1.45;
+      }
+
+      .grid {
+        margin-top: 18px;
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(12, 1fr);
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        padding: 16px;
+      }
+
+      .panel h2 {
+        margin: 0 0 10px;
+        font-size: 1.02rem;
+        color: #d7ebff;
+        letter-spacing: 0.02em;
+      }
+
+      .input-panel {
+        grid-column: span 12;
+      }
+
+      .score-panel {
+        grid-column: span 12;
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      textarea {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid rgba(123, 168, 255, 0.35);
+        background: rgba(5, 11, 24, 0.72);
+        color: var(--text);
+        padding: 12px;
+        min-height: 92px;
+        resize: vertical;
+        font: inherit;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.22);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      button {
+        border: none;
+        border-radius: 12px;
+        padding: 10px 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+      }
+
+      .primary {
+        background: linear-gradient(135deg, var(--accent), #38bdf8);
+        color: #05222b;
+        box-shadow: 0 8px 18px rgba(34, 211, 238, 0.26);
+      }
+
+      .secondary {
+        background: rgba(40, 57, 96, 0.74);
+        color: #d6e6ff;
+      }
+
+      .danger {
+        background: rgba(250, 80, 120, 0.24);
+        color: #ffd5e3;
+      }
+
+      .kpis {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      }
+
+      .kpi {
+        border: 1px solid rgba(123, 168, 255, 0.28);
+        border-radius: 12px;
+        padding: 10px;
+        background: rgba(8, 15, 31, 0.62);
+      }
+
+      .kpi .label {
+        color: var(--muted);
+        font-size: 0.82rem;
+      }
+
+      .kpi .value {
+        margin-top: 4px;
+        font-size: 1.2rem;
+        font-weight: 700;
+      }
+
+      .row-list {
+        margin-top: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .viz-grid {
+        margin-top: 14px;
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr;
+      }
+
+      .viz-card {
+        border: 1px solid rgba(120, 149, 210, 0.28);
+        border-radius: 12px;
+        padding: 12px;
+        background: rgba(8, 15, 31, 0.62);
+      }
+
+      .gauge-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .gauge-score {
+        font-size: 1.75rem;
+        font-weight: 700;
+        fill: #dbeafe;
+      }
+
+      .mouth-layout {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
+      .mouth-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      select {
+        border-radius: 10px;
+        border: 1px solid rgba(123, 168, 255, 0.35);
+        background: rgba(5, 11, 24, 0.72);
+        color: var(--text);
+        padding: 8px 10px;
+        min-width: 230px;
+      }
+
+      .zone-shape {
+        fill: rgba(90, 110, 160, 0.25);
+        stroke: rgba(174, 208, 255, 0.5);
+        stroke-width: 1;
+        cursor: pointer;
+        transition: fill 0.14s ease, transform 0.14s ease;
+      }
+
+      .zone-click {
+        cursor: pointer;
+      }
+
+      .arc-segment {
+        fill: none;
+        stroke-width: 26;
+        stroke-linecap: butt;
+        opacity: 0.85;
+        cursor: pointer;
+        transition: opacity 0.14s ease, stroke-width 0.14s ease;
+      }
+
+      .arc-segment:hover {
+        opacity: 1;
+      }
+
+      .arc-segment.active {
+        stroke-width: 31;
+        opacity: 1;
+      }
+
+      .guide-line {
+        stroke-dasharray: 4 5;
+        stroke-width: 2;
+        opacity: 0.9;
+      }
+
+      .mouth-label {
+        font-size: 11px;
+        fill: #dbeafe;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+
+      .zone-shape:hover {
+        fill: rgba(131, 169, 245, 0.35);
+      }
+
+      .zone-expected {
+        fill: rgba(34, 211, 238, 0.48);
+      }
+
+      .zone-observed {
+        fill: rgba(244, 63, 94, 0.45);
+      }
+
+      .zone-both {
+        fill: rgba(168, 85, 247, 0.48);
+      }
+
+      .zone-active {
+        stroke: #f8fafc;
+        stroke-width: 2;
+      }
+
+      .zone-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .pill {
+        border-radius: 999px;
+        padding: 4px 9px;
+        font-size: 0.78rem;
+        border: 1px solid rgba(162, 197, 255, 0.3);
+      }
+
+      .pill.expected { background: rgba(34, 211, 238, 0.18); }
+      .pill.observed { background: rgba(244, 63, 94, 0.18); }
+      .pill.both { background: rgba(168, 85, 247, 0.18); }
+
+      @media (min-width: 840px) {
+        .viz-grid {
+          grid-template-columns: 320px 1fr;
+        }
+      }
+
+      .row-item {
+        border: 1px solid rgba(120, 149, 210, 0.28);
+        border-radius: 10px;
+        padding: 9px 10px;
+        background: rgba(8, 13, 27, 0.64);
+      }
+
+      .tag {
+        display: inline-block;
+        padding: 2px 7px;
+        border-radius: 999px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        margin-right: 8px;
+      }
+
+      .tag.ok { background: rgba(16, 185, 129, 0.26); color: #9ff3d3; }
+      .tag.diff { background: rgba(245, 158, 11, 0.22); color: #fde2a7; }
+      .tag.miss { background: rgba(244, 63, 94, 0.26); color: #ffc2d2; }
+
+      .muted {
+        color: var(--muted);
+      }
+
+      .status {
+        margin-top: 10px;
+        color: var(--muted);
+        min-height: 1.2em;
+      }
+
+      @media (min-width: 940px) {
+        .input-panel { grid-column: span 5; }
+        .score-panel { grid-column: span 7; }
+        .split { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useMemo, useState, useRef, useEffect } = React;
+
+      const ZONE_LABELS = {
+        lips: "Lips",
+        teeth: "Teeth",
+        alveolar: "Alveolar ridge",
+        postalveolar: "Postalveolar",
+        palate: "Hard palate",
+        velum: "Velum",
+        glottis: "Glottis",
+        vowels: "Vowel tongue body",
+      };
+
+      const ZONE_HINTS = {
+        lips: "Close or round lips for bilabial/labiodental sounds (p, b, m, f, v, w).",
+        teeth: "Bring tongue/lip near teeth for dental sounds (th variants).",
+        alveolar: "Place tongue tip near the ridge behind front teeth (t, d, n, s, z, l).",
+        postalveolar: "Slightly retract tongue for sh/ch/j sounds.",
+        palate: "Raise tongue front/body for y-like and some palatal patterns.",
+        velum: "Back of tongue approaches soft palate for k, g, ng.",
+        glottis: "Airflow/frication at the glottis for h-like productions.",
+        vowels: "Adjust tongue body height/backness and lip shape for vowel quality.",
+      };
+
+      const IPA_TO_ZONE = {
+        p: "lips", b: "lips", m: "lips", f: "lips", v: "lips", w: "lips",
+        θ: "teeth", ð: "teeth",
+        t: "alveolar", d: "alveolar", n: "alveolar", s: "alveolar", z: "alveolar", l: "alveolar", ɹ: "alveolar",
+        ʃ: "postalveolar", ʒ: "postalveolar", tʃ: "postalveolar", dʒ: "postalveolar",
+        j: "palate",
+        k: "velum", ɡ: "velum", g: "velum", ŋ: "velum",
+        h: "glottis",
+        ɑ: "vowels", æ: "vowels", ʌ: "vowels", ɔ: "vowels", a: "vowels", ɪ: "vowels", i: "vowels", ʊ: "vowels", u: "vowels", ɛ: "vowels", ɝ: "vowels", ə: "vowels", o: "vowels", e: "vowels",
+      };
+
+      const IPA_MULTI = ["tʃ", "dʒ", "aɪ", "aʊ", "oʊ", "ɔɪ", "eɪ"];
+
+      const VOWEL_SYMBOLS = new Set(["i", "ɪ", "e", "ɛ", "æ", "a", "ɑ", "ʌ", "ə", "ɜ", "ɝ", "u", "ʊ", "o", "ɔ"]);
+
+      const VOWEL_POSITIONS = {
+        i: { x: 118, y: 102, label: "i" },
+        ɪ: { x: 163, y: 132, label: "ɪ" },
+        e: { x: 188, y: 188, label: "e" },
+        ɛ: { x: 208, y: 226, label: "ɛ" },
+        æ: { x: 242, y: 296, label: "æ" },
+        a: { x: 248, y: 338, label: "a" },
+        ɑ: { x: 470, y: 336, label: "ɑ" },
+        ʌ: { x: 338, y: 214, label: "ʌ" },
+        ə: { x: 384, y: 206, label: "ə" },
+        ɜ: { x: 332, y: 132, label: "ɜ" },
+        ɝ: { x: 372, y: 132, label: "ɝ" },
+        u: { x: 462, y: 98, label: "u" },
+        ʊ: { x: 457, y: 128, label: "ʊ" },
+        o: { x: 454, y: 188, label: "o" },
+        ɔ: { x: 450, y: 226, label: "ɔ" },
+      };
+
+      const VOWEL_HINTS = {
+        i: "High front tense vowel: tongue high/front, lips unrounded.",
+        ɪ: "Near-high front lax vowel: tongue slightly lower than i.",
+        e: "Mid front tense vowel: tongue front-mid, unrounded.",
+        ɛ: "Mid front lax vowel: lower and more open than e.",
+        æ: "Near-low front vowel: jaw opens, tongue low-front.",
+        a: "Low front-central vowel: open jaw, tongue low.",
+        ɑ: "Low back unrounded vowel: tongue low/back.",
+        ʌ: "Mid-low central/back vowel: neutral lips.",
+        ə: "Schwa: central relaxed vowel, reduced articulation.",
+        ɜ: "Mid central vowel: centralized tongue body.",
+        ɝ: "Rhotic central vowel: central tongue with rhotic coloring.",
+        u: "High back tense rounded vowel.",
+        ʊ: "Near-high back lax rounded vowel.",
+        o: "Mid back rounded vowel.",
+        ɔ: "Open-mid back rounded vowel.",
+      };
+
+      function extractIpaUnits(ipaText) {
+        const raw = (ipaText || "").replace(/[ˈˌ\s]/g, "");
+        const units = [];
+        let i = 0;
+        while (i < raw.length) {
+          const pair = raw.slice(i, i + 2);
+          if (IPA_MULTI.includes(pair)) {
+            units.push(pair);
+            i += 2;
+            continue;
+          }
+          units.push(raw[i]);
+          i += 1;
+        }
+        return units;
+      }
+
+      function zonesFromIpa(ipaText) {
+        const zones = new Set();
+        extractIpaUnits(ipaText).forEach((unit) => {
+          const zone = IPA_TO_ZONE[unit];
+          if (zone) {
+            zones.add(zone);
+          }
+        });
+        return Array.from(zones);
+      }
+
+      function unique(arr) {
+        return Array.from(new Set(arr));
+      }
+
+      function vowelUnitsFromIpa(ipaText) {
+        return extractIpaUnits(ipaText).filter((u) => VOWEL_SYMBOLS.has(u));
+      }
+
+      function consonantZonesFromIpa(ipaText) {
+        return zonesFromIpa(ipaText).filter((z) => z !== "vowels");
+      }
+
+      function PronunciationGauge({ score }) {
+        const safeScore = Number.isFinite(score) ? Math.max(0, Math.min(100, score)) : 0;
+        const radius = 88;
+        const cx = 110;
+        const cy = 110;
+        const angle = (safeScore / 100) * 180 - 180;
+        const rad = (angle * Math.PI) / 180;
+        const x2 = cx + Math.cos(rad) * 72;
+        const y2 = cy + Math.sin(rad) * 72;
+        const arcPath = `M ${cx - radius} ${cy} A ${radius} ${radius} 0 0 1 ${cx + radius} ${cy}`;
+
+        return (
+          <div className="gauge-wrap">
+            <svg width="220" height="138" viewBox="0 0 220 138" role="img" aria-label="Pronunciation score gauge">
+              <path d={arcPath} fill="none" stroke="rgba(123, 168, 255, 0.2)" strokeWidth="14" strokeLinecap="round" />
+              <path
+                d={arcPath}
+                fill="none"
+                stroke="url(#g)"
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray={`${(safeScore / 100) * 277} 277`}
+              />
+              <line x1={cx} y1={cy} x2={x2} y2={y2} stroke="#e2e8f0" strokeWidth="4" strokeLinecap="round" />
+              <circle cx={cx} cy={cy} r="6" fill="#e2e8f0" />
+              <text x="110" y="92" textAnchor="middle" className="gauge-score">{safeScore.toFixed(1)}%</text>
+              <text x="110" y="114" textAnchor="middle" fill="#9bb0d1" fontSize="12">Pronunciation Score</text>
+              <defs>
+                <linearGradient id="g" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0%" stopColor="#f97316" />
+                  <stop offset="50%" stopColor="#facc15" />
+                  <stop offset="100%" stopColor="#22d3ee" />
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+        );
+      }
+
+      function MouthModel({ expectedZones, observedZones, activeZone, onZoneSelect }) {
+        const zoneClass = (zoneId) => {
+          const expected = expectedZones.includes(zoneId);
+          const observed = observedZones.includes(zoneId);
+          if (expected && observed) return "zone-shape zone-both";
+          if (expected) return "zone-shape zone-expected";
+          if (observed) return "zone-shape zone-observed";
+          return "zone-shape";
+        };
+
+        const activeClass = (zoneId) => activeZone === zoneId ? " zone-active" : "";
+
+        const zoneStroke = (zoneId) => {
+          if (zoneId === "lips") return "#dc2626";
+          if (zoneId === "teeth") return "#f59e0b";
+          if (zoneId === "alveolar") return "#65a30d";
+          if (zoneId === "postalveolar") return "#16a34a";
+          if (zoneId === "palate") return "#0ea5e9";
+          if (zoneId === "velum") return "#7c3aed";
+          if (zoneId === "glottis") return "#475569";
+          if (zoneId === "vowels") return "#f97316";
+          return "#94a3b8";
+        };
+
+        return (
+          <svg viewBox="0 0 640 520" width="100%" height="420" role="img" aria-label="Interactive mouth articulation map">
+            <rect x="8" y="8" width="624" height="504" rx="16" fill="rgba(8, 13, 27, 0.45)" stroke="rgba(120, 149, 210, 0.24)" />
+
+            <path
+              d="M452 447 C462 404 460 356 451 317 C445 288 453 246 473 214 C493 183 506 149 503 120 C499 80 474 56 434 53 C401 50 364 64 343 87 C321 112 304 134 284 150 C258 170 223 183 205 215 C188 246 186 287 196 322 C204 348 217 370 225 398 C233 425 229 454 215 477 L452 477 Z"
+              fill="#c29562"
+            />
+
+            <path
+              d="M198 286 C196 253 206 227 223 203 C248 168 278 154 302 125 C322 102 340 76 371 67 C397 60 421 61 442 78 C461 95 468 116 469 138 C470 158 462 176 450 193 C435 215 423 241 421 267 C420 291 430 327 406 347 C381 367 339 349 314 336 C280 319 254 306 227 303 C216 301 205 296 198 286 Z"
+              fill="#ead4af"
+              opacity="0.95"
+            />
+
+            <path d="M186 262 C201 253 216 254 231 259 C220 267 205 271 188 272 Z" fill="#a1172b" className="zone-click" onClick={() => onZoneSelect("lips")} />
+            <path d="M188 281 C203 274 220 276 232 285 C218 289 204 289 190 289 Z" fill="#be1e2d" className="zone-click" onClick={() => onZoneSelect("lips")} />
+            <ellipse cx="238" cy="261" rx="10" ry="9" className={zoneClass("teeth") + activeClass("teeth")} onClick={() => onZoneSelect("teeth")} />
+
+            <path
+              d="M244 263 C268 253 296 247 324 246 C354 245 381 250 403 262"
+              stroke="#8e0f5a"
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="round"
+              className="zone-click"
+              onClick={() => onZoneSelect("palate")}
+            />
+
+            <path
+              d="M244 264 C268 254 291 248 309 246"
+              stroke={zoneClass("alveolar").includes("expected") || zoneClass("alveolar").includes("observed") ? "#84cc16" : "#5f8f2f"}
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="round"
+              className="zone-click"
+              onClick={() => onZoneSelect("alveolar")}
+            />
+
+            <path
+              d="M309 246 C330 245 347 246 362 248"
+              stroke={zoneClass("postalveolar").includes("expected") || zoneClass("postalveolar").includes("observed") ? "#0ea5e9" : "#2f8f5f"}
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="round"
+              className="zone-click"
+              onClick={() => onZoneSelect("postalveolar")}
+            />
+
+            <path
+              d="M362 248 C378 251 391 256 403 262"
+              stroke={zoneClass("velum").includes("expected") || zoneClass("velum").includes("observed") ? "#7c3aed" : "#6b2fa0"}
+              strokeWidth="10"
+              fill="none"
+              strokeLinecap="round"
+              className="zone-click"
+              onClick={() => onZoneSelect("velum")}
+            />
+
+            <ellipse cx="308" cy="287" rx="73" ry="25" className={zoneClass("vowels") + activeClass("vowels")} onClick={() => onZoneSelect("vowels")} />
+            <ellipse cx="429" cy="408" rx="14" ry="8" transform="rotate(-22 429 408)" className={zoneClass("glottis") + activeClass("glottis")} onClick={() => onZoneSelect("glottis")} />
+
+            <g>
+              <path d="M110 120 A 205 205 0 0 1 164 54" stroke="#d32f2f" className={`arc-segment ${activeZone === "lips" ? "active" : ""}`} onClick={() => onZoneSelect("lips")} />
+              <path d="M164 54 A 205 205 0 0 1 213 35" stroke="#f59e0b" className={`arc-segment ${activeZone === "teeth" ? "active" : ""}`} onClick={() => onZoneSelect("teeth")} />
+              <path d="M213 35 A 205 205 0 0 1 276 25" stroke="#84cc16" className={`arc-segment ${activeZone === "alveolar" ? "active" : ""}`} onClick={() => onZoneSelect("alveolar")} />
+              <path d="M276 25 A 205 205 0 0 1 337 31" stroke="#16a34a" className={`arc-segment ${activeZone === "postalveolar" ? "active" : ""}`} onClick={() => onZoneSelect("postalveolar")} />
+              <path d="M337 31 A 205 205 0 0 1 401 54" stroke="#0ea5e9" className={`arc-segment ${activeZone === "palate" ? "active" : ""}`} onClick={() => onZoneSelect("palate")} />
+              <path d="M401 54 A 205 205 0 0 1 454 93" stroke="#7c3aed" className={`arc-segment ${activeZone === "velum" ? "active" : ""}`} onClick={() => onZoneSelect("velum")} />
+              <path d="M454 93 A 205 205 0 0 1 487 140" stroke="#334155" className={`arc-segment ${activeZone === "glottis" ? "active" : ""}`} onClick={() => onZoneSelect("glottis")} />
+            </g>
+
+            <path d="M121 124 L196 264" className="guide-line" stroke={zoneStroke("lips")} />
+            <path d="M181 58 L238 261" className="guide-line" stroke={zoneStroke("teeth")} />
+            <path d="M242 32 L293 248" className="guide-line" stroke={zoneStroke("alveolar")} />
+            <path d="M309 25 L336 248" className="guide-line" stroke={zoneStroke("postalveolar")} />
+            <path d="M375 41 L365 252" className="guide-line" stroke={zoneStroke("palate")} />
+            <path d="M431 73 L399 262" className="guide-line" stroke={zoneStroke("velum")} />
+            <path d="M482 130 L429 408" className="guide-line" stroke={zoneStroke("glottis")} />
+
+            <text x="90" y="93" className="mouth-label">Bilabial</text>
+            <text x="151" y="38" className="mouth-label">Labio-dental</text>
+            <text x="228" y="18" className="mouth-label">Alveolar</text>
+            <text x="301" y="16" className="mouth-label">Post-alveolar</text>
+            <text x="369" y="34" className="mouth-label">Palatal</text>
+            <text x="436" y="63" className="mouth-label">Velar</text>
+            <text x="492" y="112" className="mouth-label">Glottal</text>
+
+            <text x="75" y="156" fill="#fca5a5" fontSize="12">p b m w</text>
+            <text x="146" y="102" fill="#fcd34d" fontSize="12">f v θ ð</text>
+            <text x="219" y="82" fill="#d9f99d" fontSize="12">t d s z n l r</text>
+            <text x="302" y="77" fill="#86efac" fontSize="12">ʃ ʒ tʃ dʒ</text>
+            <text x="386" y="95" fill="#7dd3fc" fontSize="12">j</text>
+            <text x="446" y="126" fill="#c4b5fd" fontSize="12">k g ŋ</text>
+            <text x="508" y="166" fill="#cbd5e1" fontSize="12">h</text>
+
+            <text x="66" y="487" fill="#b8cfff" fontSize="11">Click arc segments or mouth zones to explore where sounds should be articulated.</text>
+          </svg>
+        );
+      }
+
+      function VowelTongueChart({ expectedVowels, observedVowels, activeVowel, onVowelSelect }) {
+        const allVowels = unique([...expectedVowels, ...observedVowels]);
+
+        const dotClass = (symbol) => {
+          const isExpected = expectedVowels.includes(symbol);
+          const isObserved = observedVowels.includes(symbol);
+          if (isExpected && isObserved) return "zone-shape zone-both";
+          if (isExpected) return "zone-shape zone-expected";
+          if (isObserved) return "zone-shape zone-observed";
+          return "zone-shape";
+        };
+
+        return (
+          <svg viewBox="0 0 560 400" width="100%" height="340" role="img" aria-label="Interactive vowel tongue-position chart">
+            <rect x="10" y="10" width="540" height="380" rx="12" fill="rgba(8, 13, 27, 0.45)" stroke="rgba(120, 149, 210, 0.24)" />
+
+            <polygon points="120,65 480,65 480,345 250,345" fill="none" stroke="#cbd5e1" strokeWidth="2" />
+            <line x1="120" y1="65" x2="250" y2="345" stroke="#cbd5e1" strokeWidth="2" />
+            <line x1="250" y1="65" x2="380" y2="345" stroke="#cbd5e1" strokeWidth="1.5" />
+            <line x1="380" y1="65" x2="380" y2="345" stroke="#cbd5e1" strokeWidth="1.5" />
+
+            <line x1="185" y1="205" x2="480" y2="205" stroke="#cbd5e1" strokeWidth="1.5" />
+            <line x1="223" y1="275" x2="480" y2="275" stroke="#cbd5e1" strokeWidth="1.5" />
+
+            <text x="130" y="48" className="mouth-label">Front</text>
+            <text x="286" y="48" className="mouth-label">Central</text>
+            <text x="430" y="48" className="mouth-label">Back</text>
+
+            <text x="66" y="118" className="mouth-label">High</text>
+            <text x="66" y="214" className="mouth-label">Mid</text>
+            <text x="66" y="302" className="mouth-label">Low</text>
+            <text x="493" y="118" className="mouth-label">High</text>
+            <text x="496" y="214" className="mouth-label">Mid</text>
+            <text x="499" y="302" className="mouth-label">Low</text>
+
+            {Object.keys(VOWEL_POSITIONS).map((symbol) => {
+              const p = VOWEL_POSITIONS[symbol];
+              const active = activeVowel === symbol;
+              return (
+                <g key={symbol} onClick={() => onVowelSelect(symbol)} style={{ cursor: "pointer" }}>
+                  <circle
+                    cx={p.x}
+                    cy={p.y - 14}
+                    r={active ? 16 : 12}
+                    className={dotClass(symbol) + (active ? " zone-active" : "")}
+                  />
+                  <text x={p.x} y={p.y - 9} textAnchor="middle" fontSize="16" fill="#e5f0ff">{p.label}</text>
+                </g>
+              );
+            })}
+
+            <text x="25" y="378" fill="#b8cfff" fontSize="11">
+              Click vowel symbols. Expected, observed, and overlap positions are color-coded.
+            </text>
+          </svg>
+        );
+      }
+
+      function App() {
+        const [promptText, setPromptText] = useState("");
+        const [recognizedText, setRecognizedText] = useState("");
+        const [result, setResult] = useState(null);
+        const [status, setStatus] = useState("Ready");
+        const [loading, setLoading] = useState(false);
+        const [selectedWordIndex, setSelectedWordIndex] = useState(0);
+        const [activeZone, setActiveZone] = useState("alveolar");
+        const [activeVowel, setActiveVowel] = useState("i");
+        const recognitionRef = useRef(null);
+
+        const supportsSpeech = useMemo(() => {
+          return !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+        }, []);
+
+        const startBrowserRecognition = () => {
+          const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+          if (!Recognition) {
+            setStatus("Browser speech recognition is not supported. Type recognized text manually.");
+            return;
+          }
+
+          const recognition = new Recognition();
+          recognition.lang = "en-US";
+          recognition.continuous = false;
+          recognition.interimResults = false;
+
+          recognition.onstart = () => setStatus("Listening from browser microphone...");
+          recognition.onresult = (event) => {
+            const text = event.results?.[0]?.[0]?.transcript || "";
+            setRecognizedText(text);
+            setStatus("Speech captured. Review and click Analyze.");
+          };
+          recognition.onerror = (event) => {
+            setStatus(`Speech recognition error: ${event.error}`);
+          };
+          recognition.onend = () => {
+            if (!recognizedText) {
+              setStatus("Stopped listening.");
+            }
+          };
+
+          recognitionRef.current = recognition;
+          recognition.start();
+        };
+
+        const stopBrowserRecognition = () => {
+          if (recognitionRef.current) {
+            recognitionRef.current.stop();
+            setStatus("Listening stopped.");
+          }
+        };
+
+        const analyze = async () => {
+          if (!promptText.trim()) {
+            setStatus("Please enter the sentence you will pronounce.");
+            return;
+          }
+
+          setLoading(true);
+          setStatus("Analyzing pronunciation...");
+
+          try {
+            const response = await fetch("/api/analyze", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ prompt_text: promptText, recognized_text: recognizedText }),
+            });
+
+            const payload = await response.json();
+            if (!response.ok) {
+              throw new Error(payload.error || "Request failed");
+            }
+
+            setResult(payload);
+            setSelectedWordIndex(0);
+            setStatus("Analysis complete.");
+          } catch (err) {
+            setStatus(`Error: ${err.message}`);
+          } finally {
+            setLoading(false);
+          }
+        };
+
+        const clearAll = () => {
+          setPromptText("");
+          setRecognizedText("");
+          setResult(null);
+          setStatus("Cleared");
+        };
+
+        const issueWords = result ? result.word_rows.filter((w) => w.has_phoneme_issue) : [];
+        const missingWords = result ? result.word_rows.filter((w) => w.missing_from_recognition) : [];
+        const selectedIssueWord = issueWords[selectedWordIndex] || null;
+        const expectedMismatchIpa = selectedIssueWord
+          ? selectedIssueWord.mismatch_segments.map((m) => m.expected).join("") || selectedIssueWord.expected_ipa
+          : "";
+        const observedMismatchIpa = selectedIssueWord
+          ? selectedIssueWord.mismatch_segments.map((m) => m.observed).join("") || selectedIssueWord.recognized_ipa
+          : "";
+
+        const expectedZones = selectedIssueWord
+          ? consonantZonesFromIpa(expectedMismatchIpa)
+          : [];
+        const observedZones = selectedIssueWord
+          ? consonantZonesFromIpa(observedMismatchIpa)
+          : [];
+
+        const expectedVowels = selectedIssueWord ? vowelUnitsFromIpa(expectedMismatchIpa) : [];
+        const observedVowels = selectedIssueWord ? vowelUnitsFromIpa(observedMismatchIpa) : [];
+        const hasVowelMismatch = expectedVowels.length > 0 || observedVowels.length > 0;
+        const hasConsonantMismatch = expectedZones.length > 0 || observedZones.length > 0;
+
+        useEffect(() => {
+          const firstVowel = expectedVowels[0] || observedVowels[0];
+          if (firstVowel) {
+            setActiveVowel(firstVowel);
+          }
+        }, [selectedWordIndex]);
+
+        return (
+          <div className="wrap">
+            <section className="hero">
+              <h1>Northwest Accent Coach</h1>
+              <p className="subtitle">
+                Enter your target sentence, capture or type recognized speech, and get stress-aware IPA feedback with word-level pronunciation guidance.
+              </p>
+            </section>
+
+            <div className="grid">
+              <section className="panel input-panel">
+                <h2>Input</h2>
+                <div className="split">
+                  <div>
+                    <div className="muted">Sentence you will pronounce</div>
+                    <textarea
+                      value={promptText}
+                      onChange={(e) => setPromptText(e.target.value)}
+                      placeholder="Type the sentence you intend to pronounce..."
+                    />
+                  </div>
+
+                  <div>
+                    <div className="muted">Recognized speech (auto-filled or manually editable)</div>
+                    <textarea
+                      value={recognizedText}
+                      onChange={(e) => setRecognizedText(e.target.value)}
+                      placeholder="Use browser microphone or type recognized text..."
+                    />
+                  </div>
+                </div>
+
+                <div className="actions">
+                  <button className="primary" onClick={startBrowserRecognition} disabled={!supportsSpeech}>
+                    Start Mic
+                  </button>
+                  <button className="secondary" onClick={stopBrowserRecognition}>Stop Mic</button>
+                  <button className="primary" onClick={analyze} disabled={loading}>
+                    {loading ? "Analyzing..." : "Analyze"}
+                  </button>
+                  <button className="danger" onClick={clearAll}>Clear</button>
+                </div>
+
+                <div className="status">{status}</div>
+              </section>
+
+              <section className="panel score-panel">
+                <h2>Scoring and Feedback</h2>
+
+                {!result && <div className="muted">Run an analysis to see pronunciation scoring and corrections.</div>}
+
+                {result && (
+                  <>
+                    <div className="kpis">
+                      <div className="kpi">
+                        <div className="label">Sentence Match</div>
+                        <div className="value">{(result.lexical_accuracy * 100).toFixed(1)}%</div>
+                      </div>
+                      <div className="kpi">
+                        <div className="label">IPA Similarity</div>
+                        <div className="value">{(result.ipa_similarity * 100).toFixed(1)}%</div>
+                      </div>
+                      <div className="kpi">
+                        <div className="label">NW Proficiency</div>
+                        <div className="value">{(result.proficiency_score * 100).toFixed(1)}%</div>
+                      </div>
+                      <div className="kpi">
+                        <div className="label">Assessment</div>
+                        <div className="value" style={{ fontSize: "1rem" }}>{result.assessment}</div>
+                      </div>
+                    </div>
+
+                    <div className="viz-grid">
+                      <div className="viz-card">
+                        <h2 style={{ marginBottom: "4px" }}>Score Gauge</h2>
+                        <PronunciationGauge score={result.proficiency_score * 100} />
+                      </div>
+
+                      <div className="viz-card">
+                        <h2 style={{ marginBottom: "6px" }}>Interactive Mouth Model</h2>
+                        <div className="mouth-layout">
+                          <div className="mouth-controls">
+                            <select
+                              value={selectedWordIndex}
+                              onChange={(e) => setSelectedWordIndex(Number(e.target.value))}
+                              disabled={issueWords.length === 0}
+                            >
+                              {issueWords.length === 0 && <option value={0}>No mismatched words</option>}
+                              {issueWords.map((w, idx) => (
+                                <option key={`${w.expected_word}-${idx}`} value={idx}>
+                                  {w.expected_word} -> {w.recognized_word || "(missing)"}
+                                </option>
+                              ))}
+                            </select>
+                            <div className="muted">Selected zone: {ZONE_LABELS[activeZone] || "None"}</div>
+                          </div>
+
+                          {hasConsonantMismatch && (
+                            <>
+                              <div className="muted" style={{ fontWeight: 700 }}>Consonant Place Model</div>
+                              <MouthModel
+                                expectedZones={expectedZones}
+                                observedZones={observedZones}
+                                activeZone={activeZone}
+                                onZoneSelect={setActiveZone}
+                              />
+                            </>
+                          )}
+
+                          {hasVowelMismatch && (
+                            <>
+                              <div className="muted" style={{ fontWeight: 700 }}>Vowel Tongue Position Model</div>
+                              <VowelTongueChart
+                                expectedVowels={expectedVowels}
+                                observedVowels={observedVowels}
+                                activeVowel={activeVowel}
+                                onVowelSelect={setActiveVowel}
+                              />
+                            </>
+                          )}
+
+                          {!hasConsonantMismatch && !hasVowelMismatch && (
+                            <div className="row-item">No articulatory mismatch segments available for this word.</div>
+                          )}
+
+                          <div className="zone-legend">
+                            <span className="pill expected">Expected articulation</span>
+                            <span className="pill observed">Observed articulation</span>
+                            <span className="pill both">Overlap</span>
+                          </div>
+
+                          <div className="row-item">
+                            <strong>{ZONE_LABELS[activeZone] || "Articulation hint"}:</strong> {ZONE_HINTS[activeZone] || "Select a zone to see guidance."}
+                          </div>
+
+                          {hasVowelMismatch && (
+                            <div className="row-item">
+                              <strong>Vowel guidance ({activeVowel}):</strong> {VOWEL_HINTS[activeVowel] || "Click a vowel target to view guidance."}
+                            </div>
+                          )}
+
+                          {selectedIssueWord && (
+                            <div className="row-item">
+                              <strong>Current mismatch:</strong> {selectedIssueWord.expected_word} ({selectedIssueWord.expected_ipa}) vs {selectedIssueWord.recognized_word || "(missing)"} ({selectedIssueWord.recognized_ipa})
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="row-list" style={{ marginTop: "14px" }}>
+                      <div className="row-item"><strong>Expected IPA:</strong> {result.expected_dictionary_ipa}</div>
+                      <div className="row-item"><strong>Recognized IPA:</strong> {result.recognized_dictionary_ipa}</div>
+                      <div className="row-item"><strong>Expected (stress-neutral):</strong> {result.expected_dictionary_ipa_no_stress}</div>
+                      <div className="row-item"><strong>Recognized (stress-neutral):</strong> {result.recognized_dictionary_ipa_no_stress}</div>
+                    </div>
+
+                    <h2 style={{ marginTop: "14px" }}>Words Requiring Attention</h2>
+                    <div className="row-list">
+                      {issueWords.length === 0 && missingWords.length === 0 && (
+                        <div className="row-item">No major word-level issues detected.</div>
+                      )}
+
+                      {issueWords.map((word, idx) => (
+                        <div key={`issue-${idx}`} className="row-item">
+                          <span className="tag diff">DIFF</span>
+                          <strong>{word.expected_word}</strong> target {word.expected_ipa} vs recognized {word.recognized_ipa}
+                          {word.mismatch_segments.length > 0 && (
+                            <div className="muted" style={{ marginTop: "6px" }}>
+                              {word.mismatch_segments.map((m, mi) => (
+                                <div key={mi}>expected "{m.expected}" but heard-like "{m.observed}"</div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+
+                      {missingWords.map((word, idx) => (
+                        <div key={`miss-${idx}`} className="row-item">
+                          <span className="tag miss">MISS</span>
+                          <strong>{word.expected_word}</strong> was not recognized (target IPA: {word.expected_ipa})
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </section>
+            </div>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+    </script>
+  </body>
+</html>
