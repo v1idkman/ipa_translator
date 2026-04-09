@@ -321,40 +321,85 @@ def analyze_prompt_vs_recognized(prompt_text, recognized_text, lexicon):
     expected_no_stress = remove_stress_marks(expected_dictionary_ipa)
     recognized_no_stress = remove_stress_marks(recognized_dictionary_ipa)
 
-    max_len = max(len(expected_words), len(recognized_words))
     matched_words = 0
     word_rows = []
 
-    for i in range(max_len):
-        expected_word = expected_words[i] if i < len(expected_words) else ""
-        recognized_word = recognized_words[i] if i < len(recognized_words) else ""
+    def word_to_ipa(word):
+        if not word:
+            return ""
+        arpabet = lexicon.get(word, "")
+        return arpabet_to_ipa(arpabet) if arpabet else ipa.convert(word)
 
-        expected_arpabet = lexicon.get(expected_word, "") if expected_word else ""
-        recognized_arpabet = lexicon.get(recognized_word, "") if recognized_word else ""
+    # Align expected and recognized words to avoid cascading mismatches when one word is inserted/deleted.
+    matcher = difflib.SequenceMatcher(None, expected_words, recognized_words)
+    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+        if tag == "equal":
+            for e_word, r_word in zip(expected_words[i1:i2], recognized_words[j1:j2]):
+                matched_words += 1
+                word_rows.append(
+                    {
+                        "expected_word": e_word,
+                        "recognized_word": r_word,
+                        "expected_ipa": word_to_ipa(e_word),
+                        "recognized_ipa": word_to_ipa(r_word),
+                        "word_match": True,
+                        "missing_from_recognition": False,
+                        "has_phoneme_issue": False,
+                        "mismatch_segments": [],
+                    }
+                )
+            continue
 
-        expected_ipa = arpabet_to_ipa(expected_arpabet) if expected_arpabet else ipa.convert(expected_word) if expected_word else ""
-        recognized_ipa = arpabet_to_ipa(recognized_arpabet) if recognized_arpabet else ipa.convert(recognized_word) if recognized_word else ""
+        e_chunk = expected_words[i1:i2]
+        r_chunk = recognized_words[j1:j2]
+        pair_len = min(len(e_chunk), len(r_chunk))
 
-        word_match = expected_word == recognized_word and expected_word != ""
-        if word_match:
-            matched_words += 1
+        for idx in range(pair_len):
+            e_word = e_chunk[idx]
+            r_word = r_chunk[idx]
+            e_ipa = word_to_ipa(e_word)
+            r_ipa = word_to_ipa(r_word)
+            mismatch_segments = get_ipa_mismatch_segments(e_ipa, r_ipa, ignore_stress=True)
+            word_rows.append(
+                {
+                    "expected_word": e_word,
+                    "recognized_word": r_word,
+                    "expected_ipa": e_ipa,
+                    "recognized_ipa": r_ipa,
+                    "word_match": False,
+                    "missing_from_recognition": False,
+                    "has_phoneme_issue": bool(mismatch_segments),
+                    "mismatch_segments": mismatch_segments,
+                }
+            )
 
-        mismatch_segments = get_ipa_mismatch_segments(expected_ipa, recognized_ipa, ignore_stress=True) if expected_word and recognized_word else []
-        missing_from_recognition = bool(expected_word and not recognized_word)
-        has_phoneme_issue = bool(expected_word and recognized_word and mismatch_segments)
+        for e_word in e_chunk[pair_len:]:
+            word_rows.append(
+                {
+                    "expected_word": e_word,
+                    "recognized_word": "",
+                    "expected_ipa": word_to_ipa(e_word),
+                    "recognized_ipa": "",
+                    "word_match": False,
+                    "missing_from_recognition": True,
+                    "has_phoneme_issue": False,
+                    "mismatch_segments": [],
+                }
+            )
 
-        word_rows.append(
-            {
-                "expected_word": expected_word,
-                "recognized_word": recognized_word,
-                "expected_ipa": expected_ipa,
-                "recognized_ipa": recognized_ipa,
-                "word_match": word_match,
-                "missing_from_recognition": missing_from_recognition,
-                "has_phoneme_issue": has_phoneme_issue,
-                "mismatch_segments": mismatch_segments,
-            }
-        )
+        for r_word in r_chunk[pair_len:]:
+            word_rows.append(
+                {
+                    "expected_word": "",
+                    "recognized_word": r_word,
+                    "expected_ipa": "",
+                    "recognized_ipa": word_to_ipa(r_word),
+                    "word_match": False,
+                    "missing_from_recognition": False,
+                    "has_phoneme_issue": False,
+                    "mismatch_segments": [],
+                }
+            )
 
     lexical_accuracy = matched_words / len(expected_words) if expected_words else 0.0
     ipa_similarity = similarity_score(expected_no_stress, recognized_no_stress)
