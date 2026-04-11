@@ -406,11 +406,11 @@ def analyze_prompt_vs_recognized(prompt_text, recognized_text, lexicon):
     proficiency_score = (0.65 * lexical_accuracy) + (0.35 * ipa_similarity)
 
     if proficiency_score >= 0.85:
-        assessment = "Strong alignment with intended Northwest pronunciation"
+        assessment = "Strong Northwest pronunciation"
     elif proficiency_score >= 0.65:
-        assessment = "Moderate alignment with intended Northwest pronunciation"
+        assessment = "Moderate Northwest pronunciation"
     else:
-        assessment = "Low alignment with intended Northwest pronunciation"
+        assessment = "Poor Northwest pronunciation"
 
     return {
         "prompt_text": prompt_text,

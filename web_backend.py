@@ -19,7 +19,7 @@ for package, module_name in REQUIRED_PACKAGES.items():
         subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
-app = Flask(__name__, static_folder="web")
+app = Flask(__name__, static_folder="web", static_url_path="/static")
 lexicon = model.load_northwest_american_lexicon()
 
 
@@ -49,6 +49,12 @@ def analyze():
 @app.route("/api/health")
 def health():
     return jsonify({"status": "ok"})
+
+
+@app.route("/english_consonant_chart.jpg")
+@app.route("/web/english_consonant_chart.jpg")
+def consonant_chart_image():
+    return send_from_directory(app.static_folder, "english_consonant_chart.jpg")
 
 
 if __name__ == "__main__":
